@@ -8,6 +8,9 @@ from django.db import models
 
 
 class Note(models.Model):
+    """
+      class Note models field
+    """
     note = models.TextField()
     key = models.CharField(max_length=250)
     email = models.EmailField()
