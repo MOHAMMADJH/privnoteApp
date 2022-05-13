@@ -15,7 +15,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-
+from heroo import views
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('Note',views.NoteList.as_view()),
 ]

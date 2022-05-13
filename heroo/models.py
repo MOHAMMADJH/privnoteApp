@@ -11,17 +11,19 @@ class Note(models.Model):
     """
       class Note models field
     """
+    note_id = models.CharField(max_length=200,
+                               null=False,
+                               default=uuid.uuid4())
+    name = models.CharField(null=False,
+                            max_length=200)
     note = models.TextField()
-    key = models.CharField(max_length=250)
-    email = models.EmailField()
-    password = models.CharField(max_length=200)
-    date = models.IntegerField(default=0)
-    self_d = models.DateField(default=datetime.date.today)
-    note_name = models.CharField(max_length=100)
-    is_d = models.BooleanField(default=False)
-    note_id = models.UUIDField(
-        primary_key=True,
-        default=uuid.uuid4(), )
+    # key = models.CharField(max_length=250, blank=True, )
+    email = models.EmailField(null=True, max_length=200, blank=True)
+    password = models.CharField(null=True, max_length=200, blank=True)
+    date = models.DateField(null=True, blank=True)
+    self_d = models.DateField(null=True, blank=True)
+    note_name = models.CharField(null=True, max_length=100, blank=True)
+    is_d = models.BooleanField(null=True, default=False)
 
     def __str__(self):
         return str(self.note_id)

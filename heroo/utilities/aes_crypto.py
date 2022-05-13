@@ -3,6 +3,9 @@ import hashlib
 from Cryptodome import Random
 from Cryptodome.Cipher import AES
 
+from privnoteApp.settings import KEY_AES
+
+
 class AESCipher(object):
 
     def init(self, key):
@@ -17,7 +20,7 @@ class AESCipher(object):
 
     def decrypt(self, enc):
         enc = base64.b64decode(enc)
-        #print(enc.decode())
+        # print(enc.decode())
         iv = enc[:AES.block_size]
         cipher = AES.new(self.key, AES.MODE_CBC, iv)
         return self._unpad(cipher.decrypt(enc[AES.block_size:])).decode('utf-8')
@@ -27,11 +30,12 @@ class AESCipher(object):
 
     @staticmethod
     def _unpad(s):
-        return s[:-ord(s[len(s)-1:])]
+        return s[:-ord(s[len(s) - 1:])]
 
 
+key = KEY_AES
 
-C = AESCipher("1234586896958905690569065906590")
+C = AESCipher(key)
 
 d = C.encrypt("hello from cyber sky")
 print(d)
