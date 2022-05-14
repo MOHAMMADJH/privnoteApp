@@ -32,24 +32,22 @@ class NoteList(APIView):
     def post(self, request):
         print(request.data)
         Qdata = request.data
-        # dataNote = request.data['note']
-        # dataEmail = request.data['email']
-        # dataPassword = request.data['password']
-        # dataSelf_d = request.data['self_d']
+
 
         serializer = NoteSerializer(data=Qdata)
         if serializer.is_valid():
-            # print(data)
             serializer.save()
+
             dataNote = request.data['note']
-            print(dataNote)
             C = AESCipher(KEY_AES)
             d = C.encrypt(dataNote)
-            print(Qdata)
+
             note = Note.objects.latest('id')
             note.note = d
-            md5pass = hashlib.md5(note.password.encode())
-            note.password = md5pass.hexdigest()
+
+            if note.password:
+                md5pass = hashlib.md5(note.password.encode())
+                note.password = md5pass.hexdigest()
             note.save()
 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -62,13 +60,18 @@ def reNote(request, pk):
     C = AESCipher(KEY_AES)
     try:
 
+
         noteOp = Note.objects.get(note_id=pk)
         if not noteOp.is_d:
             d_note = noteOp.note
             # print(d_note)
             noted = C.decrypt(d_note)
             # print(noted)
-            noteOp.is_d = False
+            noteOp.is_d = True
+
+
+
+
             if noteOp.email:
                 if noteOp.note_name:
                     ms += ' :: note_name'
@@ -82,6 +85,10 @@ def reNote(request, pk):
                 #           settings.EMAIL_HOST,
                 #           [noteOp.email])
                 # email F hare
+
+
+
+
             if noteOp.password:
                 ms += ' :: password'
                 try:
@@ -95,9 +102,11 @@ def reNote(request, pk):
                 except:
                     return Response({'status': 'p Enter Pass'}, status=status.HTTP_403_FORBIDDEN)
             else:
-                return Response({'status': 'Ple enter a password'}, status=status.HTTP_403_FORBIDDEN)
+                notee = noted
+            #     return Response({'status': 'Ple enter a password'}, status=status.HTTP_403_FORBIDDEN)
             if noteOp.self_d:
                 ms += ' :: self_d'
+                noteOp.save()
             return Response({'status': ms, 'note': notee}, status=status.HTTP_200_OK)
         else:
             return Response({'status': 'Note is d'}, status=status.HTTP_403_FORBIDDEN)
