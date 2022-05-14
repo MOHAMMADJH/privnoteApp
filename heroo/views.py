@@ -51,17 +51,22 @@ class NoteList(APIView):
             note.note = d  # save note encrypted on Note Op
 
             # md5 hash password encrypt
-            if note.password:  # check if
+            if note.password:  # check if password is enter from user
                 md5pass = hashlib.md5(note.password.encode())
                 note.password = md5pass.hexdigest()
-            note.save()
+            note.save()  # save password hashed
+            # end md5 code
 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        # end class
 
 
 @api_view(['GET', ' OPTIONS'])
-def reNote(request, pk, ):
+def reNote(request, pk):
+    """
+
+    """
     ms = 'reNote scsses'
     C = AESCipher(KEY_AES)
     noted = None
