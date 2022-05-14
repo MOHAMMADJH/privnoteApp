@@ -26,28 +26,32 @@ class MarketingMeetingPagination(generics.ListAPIView):
 
 
 class NoteList(APIView):
+    """
 
-    # def get(self, request, format=None):
-    #     snippets = Note.objects.all()
-    #     serializer = NoteSerializer(snippets, many=True)
-    #     return Response(serializer.data)
+        this Class save note and encrypt the note
+        and return uuid fot this Note
+
+    """
 
     def post(self, request):
         print(request.data)
-        Qdata = request.data
 
+        Qdata = request.data  # save request data in Qdata
+
+        # save data whit serializer
         serializer = NoteSerializer(data=Qdata)
         if serializer.is_valid():
             serializer.save()
 
+            # encrypt note AESCipher
             dataNote = request.data['note']
             C = AESCipher(KEY_AES)
             d = C.encrypt(dataNote)
+            note = Note.objects.latest('id')  # get last Op from DB
+            note.note = d  # save note encrypted on Note Op
 
-            note = Note.objects.latest('id')
-            note.note = d
-
-            if note.password:
+            # md5 hash password encrypt
+            if note.password:  # check if
                 md5pass = hashlib.md5(note.password.encode())
                 note.password = md5pass.hexdigest()
             note.save()
@@ -82,7 +86,7 @@ def reNote(request, pk, ):
             else:
                 return Response({'status': 'invalid password'}, status=status.HTTP_403_FORBIDDEN)
             noteOp.save()
-            is_email(noteOp,ms)
+            # is_email(noteOp,ms)
             return Response({'status': ms, 'note': notee}, status=status.HTTP_200_OK)
         else:
             return Response({'status': 'Note is d'}, status=status.HTTP_403_FORBIDDEN)
@@ -101,13 +105,13 @@ def is_password(noteOp=None, ms=None, request=None, noted=None):
             pas = md5pass.hexdigest()
             if noteOp.password == pas:
                 print('is_password_is_True')
-                return 1 #is pass
+                return 1  # is pass
             else:
-                return 2 #is not pass
+                return 2  # is not pass
         except:
-            return 3 #pass is ''
+            return 3  # pass is ''
     else:
-        return 4 #pass = Null
+        return 4  # pass = Null
 
 
 def is_email(noteOp=None, ms=None):
@@ -135,7 +139,7 @@ def is_date(noteOp=None):
             print('is_date')
             return 1
         else:
-            print('is_Not_date')  # بعني بصير دستروي
+            print('is_Not_date')  #
             return 2
     except:
         print('not_expt')
