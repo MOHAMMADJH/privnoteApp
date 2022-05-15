@@ -133,10 +133,14 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'mohjas20121997@gmail.com'
-EMAIL_HOST_PASSWORD = 'ynfdkvbxpsogxzsx'
+EMAIL_HOST_PASSWORD = 'qlpbphsqulasdgxr'
 
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+# BROKER_URL = 'amqp://guest:guest@localhost:5672/'
+BROKER_URL = 'django://'
+# INSTALLED_APPS += ('kombu.transport.django', )
+# CELERY STUFF

@@ -5,6 +5,7 @@ from django.shortcuts import render
 from django.core.mail import send_mail
 # Create your views here.
 from django.template.loader import render_to_string
+from .tasks import send_feedback_email_task
 from rest_framework import generics, status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import authentication_classes, api_view
@@ -26,11 +27,10 @@ class MarketingMeetingPagination(generics.ListAPIView):
 
 
 class NoteList(APIView):
-    """
 
+    """
         this Class save note and encrypt the note
         and return uuid fot this Note
-
     """
 
     def post(self, request):
@@ -56,7 +56,6 @@ class NoteList(APIView):
                 note.password = md5pass.hexdigest()
             note.save()  # save password hashed
             # end md5 code
-
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         # end class
@@ -69,8 +68,7 @@ def reNote(request, pk):
     """
     ms = 'reNote scsses'
     C = AESCipher(KEY_AES)
-    noted = None
-    notee = ''
+
     try:
         noteOp = Note.objects.get(note_id=pk)
         if is_date(noteOp) == 1:
@@ -80,18 +78,16 @@ def reNote(request, pk):
             # print(d_note)
             noted = C.decrypt(d_note)  # النوت غير مشقرة
             # print(noted)
-            noteOp.is_d = True
-            print(noteOp.password)
-            print(is_password(noteOp, ms, request, noted))
-            if is_password(noteOp, ms, request, noted) == 4:
+            noteOp.is_d = False
 
+            if is_password(noteOp, ms, request, noted) == 4:
                 notee = noted
             elif is_password(noteOp, ms, request, noted) == 1:
                 notee = noted
             else:
                 return Response({'status': 'invalid password'}, status=status.HTTP_403_FORBIDDEN)
             noteOp.save()
-            # is_email(noteOp,ms)
+            is_email(noteOp,ms)
             return Response({'status': ms, 'note': notee}, status=status.HTTP_200_OK)
         else:
             return Response({'status': 'Note is d'}, status=status.HTTP_403_FORBIDDEN)
@@ -128,14 +124,15 @@ def is_email(noteOp=None, ms=None):
             name = noteOp.note_name
         else:
             name = 'Note'
-        send_mail('The note "' + name + '" has been read ',
-                  'his is an automatic notification to let you know that the note you created referred as "' + name + '" has been read and was destroyed immediately after.Do you want to send another note?',
-                  settings.EMAIL_HOST,
-                  [noteOp.email])
+        # send_mail('The note "' + name + '" has been read ',
+        #           'his is an automatic notification to let you know that the note you created referred as "' + name + '" has been read and was destroyed immediately after.Do you want to send another note?',
+        #           settings.EMAIL_HOST,
+        #           [noteOp.email])
+        send_feedback_email_task.delay(noteOp.email, name)
 
 
 def is_date(noteOp=None):
-    is_date = None
+    # is_date = None
     try:
         d1 = noteOp.date_c
         d2 = noteOp.self_d
