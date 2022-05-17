@@ -40,6 +40,10 @@ INSTALLED_APPS = [
     'heroo',
 ]
 
+USE_TZ = True
+TIME_ZONE = 'Asia/Gaza'
+DATE_INPUT_FORMATS = ['%Y-%m-%d %H:%M']
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',

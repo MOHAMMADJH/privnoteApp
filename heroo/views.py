@@ -19,8 +19,10 @@ import datetime
 from heroo.utilities.aes_crypto import AESCipher
 from privnoteApp import settings
 from privnoteApp.settings import KEY_AES
+import pytz
+from datetime import datetime
 
-
+timezonegaza = pytz.timezone('Asia/Gaza')
 class MarketingMeetingPagination(generics.ListAPIView):
     queryset = Note.objects.all()
     serializer_class = NoteSerializer
@@ -49,6 +51,13 @@ class NoteList(APIView):
             d = C.encrypt(dataNote)
             note = Note.objects.latest('id')  # get last Op from DB
             note.note = d  # save note encrypted on Note Op
+            print('************')
+            
+            print(timezonegaza)
+            print(note.date_c.astimezone(timezonegaza).strftime("%Y-%m-%d %I:%M"))
+            print(note.date_c.strftime("%Y-%m-%d %I:%M"))
+            print('************')
+            # print(pytz.all_timezones)
 
             # md5 hash password encrypt
             if note.password:  # check if password is enter from user
@@ -87,7 +96,7 @@ def reNote(request, pk):
             else:
                 return Response({'status': 'invalid password'}, status=status.HTTP_403_FORBIDDEN)
             noteOp.save()
-            is_email(noteOp,ms)
+            is_email(noteOp, ms)
             return Response({'status': ms, 'note': notee}, status=status.HTTP_200_OK)
         else:
             return Response({'status': 'Note is d'}, status=status.HTTP_403_FORBIDDEN)
@@ -133,11 +142,16 @@ def is_email(noteOp=None, ms=None):
 
 def is_date(noteOp=None):
     # is_date = None
+    #note.date_c.astimezone(timezonegaza).strftime("%Y-%m-%d %I:%M")
     try:
-        d1 = noteOp.date_c
-        d2 = noteOp.self_d
-        if d1 > d2:
-            print(d1 > d2)
+        # d1 = noteOp.date_c.astimezone(timezonegaza).strftime("%Y-%m-%d %I:%M")
+        d2 = noteOp.self_d.strftime("%Y-%m-%d %I:%M")
+        dNow = datetime.now().astimezone(timezonegaza).strftime("%Y-%m-%d %I:%M")
+        # print('d1 '+ str(d1))
+        # print('d2 '+ str(d2))
+        # print('dNow ' + str(dNow))
+        if dNow > d2:
+            print(dNow > d2)
             print('is_date')
             return 1
         else:

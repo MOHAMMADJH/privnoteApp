@@ -1,12 +1,12 @@
 import datetime
 import uuid
-
+from pytz import timezone
 from django.db import models
+from django.utils.timezone import get_default_timezone
+from privnoteApp.settings import TIME_ZONE
 
 
 # Create your models here.
-
-
 class Note(models.Model):
     """
       class Note models field
@@ -15,9 +15,9 @@ class Note(models.Model):
     note = models.TextField()
     # key = models.CharField(max_length=250, blank=True, )
     email = models.EmailField(null=True, max_length=200, blank=True)
-    password = models.CharField(null=True, max_length=200, blank=True)
-    date_c = models.DateField(null=True, auto_now_add=True)
-    self_d = models.DateField(null=True, blank=True)
+    password = models.CharField(null=True, max_length=200, blank=True )
+    date_c = models.DateTimeField(null=True, auto_now_add=True)
+    self_d = models.DateTimeField(null=True, blank=True)
     note_name = models.CharField(null=True, max_length=100, blank=True)
     is_d = models.BooleanField(null=True, default=False)
 
