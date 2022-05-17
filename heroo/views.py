@@ -87,7 +87,7 @@ def reNote(request, pk):
             # print(d_note)
             noted = C.decrypt(d_note)  # النوت غير مشقرة
             # print(noted)
-            noteOp.is_d = False
+            noteOp.is_d = True
 
             if is_password(noteOp, ms, request, noted) == 4:
                 notee = noted
@@ -95,6 +95,7 @@ def reNote(request, pk):
                 notee = noted
             else:
                 return Response({'status': 'invalid password'}, status=status.HTTP_403_FORBIDDEN)
+            noteOp.note = ''
             noteOp.save()
             is_email(noteOp, ms)
             return Response({'status': ms, 'note': notee}, status=status.HTTP_200_OK)
