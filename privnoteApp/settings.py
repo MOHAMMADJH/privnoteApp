@@ -136,8 +136,8 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'mohjas20121997@gmail.com'
-EMAIL_HOST_PASSWORD = 'qlpbphsqulasdgxr'
+EMAIL_HOST_USER = 'uosefyosef16@gmail.com'
+EMAIL_HOST_PASSWORD = 'ASD123ASD'
 
 
 # Default primary key field type
@@ -148,3 +148,14 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 BROKER_URL = 'django://'
 # INSTALLED_APPS += ('kombu.transport.django', )
 # CELERY STUFF
+
+CELERY_BEAT_SCHEDULE = {
+    'add-every-10-seconds': {
+        'task': 'heroo.tasks.testa',
+        'schedule': 10.0,
+    },
+    
+
+
+
+}

@@ -32,7 +32,7 @@ class NoteList(APIView):
 
     """
         this Class save note and encrypt the note
-        and return uuid fot this Note
+        and return uuid for this Note
     """
 
     def post(self, request):
@@ -50,9 +50,8 @@ class NoteList(APIView):
             C = AESCipher(KEY_AES)
             d = C.encrypt(dataNote)
             note = Note.objects.latest('id')  # get last Op from DB
-            note.note = d  # save note encrypted on Note Op
+            note.note = d                     # save note encrypted on Note Op
             print('************')
-            
             print(timezonegaza)
             print(note.date_c.astimezone(timezonegaza).strftime("%Y-%m-%d %I:%M"))
             print(note.date_c.strftime("%Y-%m-%d %I:%M"))
@@ -73,30 +72,38 @@ class NoteList(APIView):
 @api_view(['GET', ' OPTIONS'])
 def reNote(request, pk):
     """
-
+        Return encrypted message after decrypting by uuid
+        and Checking the rest of the data entered
     """
     ms = 'reNote scsses'
+
+
+    # make new op from AESCipher and use the key encrypt from settings
     C = AESCipher(KEY_AES)
 
+    # Check if the message to be decrypted exists
     try:
         noteOp = Note.objects.get(note_id=pk)
-        if is_date(noteOp) == 1:
+        if is_date(noteOp) == 1: 
             noteOp.is_d = True
-        if not noteOp.is_d:
-            d_note = noteOp.note  # حفظ النوت
+        if not noteOp.is_d:      # Check if the message was previously deleted or not
+            d_note = noteOp.note  # Save the message in a variable on d_note
             # print(d_note)
-            noted = C.decrypt(d_note)  # النوت غير مشقرة
+            noted = C.decrypt(d_note)  #  decrypt note
             # print(noted)
-            noteOp.is_d = True
+            noteOp.is_d = True  # destroy the message
 
+            # Check password if you enter
             if is_password(noteOp, ms, request, noted) == 4:
                 notee = noted
             elif is_password(noteOp, ms, request, noted) == 1:
                 notee = noted
             else:
                 return Response({'status': 'invalid password'}, status=status.HTTP_403_FORBIDDEN)
-            noteOp.note = ''
-            noteOp.save()
+
+            noteOp.note = ''  # Delete the message from the database
+            noteOp.save() # save changes in DB
+            print('is email')
             is_email(noteOp, ms)
             return Response({'status': ms, 'note': notee}, status=status.HTTP_200_OK)
         else:
@@ -106,6 +113,11 @@ def reNote(request, pk):
 
 
 def is_password(noteOp=None, ms=None, request=None, noted=None):
+
+    """
+        Returns: the case of a password if entered and checked for correctness
+    """
+
     print('is_password_no')
     if noteOp.password:
         print('is_password_yes')
@@ -126,6 +138,9 @@ def is_password(noteOp=None, ms=None, request=None, noted=None):
 
 
 def is_email(noteOp=None, ms=None):
+    """
+    Send an email if the message has been read from the recipient to the owner of the message
+    """
     if noteOp.email:
         if noteOp.note_name:
             ms += ' :: note_name'
@@ -138,10 +153,15 @@ def is_email(noteOp=None, ms=None):
         #           'his is an automatic notification to let you know that the note you created referred as "' + name + '" has been read and was destroyed immediately after.Do you want to send another note?',
         #           settings.EMAIL_HOST,
         #           [noteOp.email])
+
+        # this task celery fun to send email for user no slow response.
         send_feedback_email_task.delay(noteOp.email, name)
 
-
+    
 def is_date(noteOp=None):
+    """
+    this fun check if Note is expired based on time
+    """
     # is_date = None
     #note.date_c.astimezone(timezonegaza).strftime("%Y-%m-%d %I:%M")
     try:
@@ -156,7 +176,7 @@ def is_date(noteOp=None):
             print('is_date')
             return 1
         else:
-            print('is_Not_date')  #
+            print('is_Not_date')  
             return 2
     except:
         print('not_expt')
